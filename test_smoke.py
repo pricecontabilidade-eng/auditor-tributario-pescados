@@ -1,1 +1,151 @@
+from pathlib import Path
 
+from app.xml_parser import parse_nfe
+
+
+def test_parse_nfe_basico():
+    """
+    Smoke test do parser de NF-e.
+
+    Valida se uma NF-e mínima é interpretada corretamente
+    e se os principais campos do cabeçalho e do item são
+    disponibilizados pelo parser.
+    """
+
+    xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+      <NFe>
+        <infNFe Id="NFe123">
+          <ide>
+            <cUF>35</cUF>
+            <natOp>VENDA</natOp>
+            <mod>55</mod>
+            <serie>1</serie>
+            <nNF>10</nNF>
+            <dhEmi>2026-08-20T10:00:00-03:00</dhEmi>
+            <idDest>2</idDest>
+            <indFinal>0</indFinal>
+          </ide>
+
+          <emit>
+            <CNPJ>12345678000199</CNPJ>
+            <xNome>EMPRESA EMITENTE</xNome>
+            <UF>SP</UF>
+            <CRT>3</CRT>
+          </emit>
+
+          <dest>
+            <CNPJ>98765432000199</CNPJ>
+            <xNome>EMPRESA DESTINATARIA</xNome>
+            <UF>BA</UF>
+          </dest>
+
+          <det nItem="1">
+            <prod>
+              <cProd>001</cProd>
+              <xProd>PEIXE CONGELADO</xProd>
+              <NCM>03038990</NCM>
+              <CEST>0300100</CEST>
+              <CFOP>6102</CFOP>
+              <uCom>KG</uCom>
+              <qCom>10.0000</qCom>
+              <vUnCom>20.0000</vUnCom>
+              <vProd>200.00</vProd>
+            </prod>
+
+            <imposto>
+              <ICMS>
+                <ICMS00>
+                  <orig>0</orig>
+                  <CST>00</CST>
+                  <modBC>3</modBC>
+                  <vBC>200.00</vBC>
+                  <pICMS>7.00</pICMS>
+                  <vICMS>14.00</vICMS>
+                </ICMS00>
+              </ICMS>
+
+              <PIS>
+                <PISAliq>
+                  <CST>01</CST>
+                  <vBC>200.00</vBC>
+                  <pPIS>1.65</pPIS>
+                  <vPIS>3.30</vPIS>
+                </PISAliq>
+              </PIS>
+
+              <COFINS>
+                <COFINSAliq>
+                  <CST>01</CST>
+                  <vBC>200.00</vBC>
+                  <pCOFINS>7.60</pCOFINS>
+                  <vCOFINS>15.20</vCOFINS>
+                </COFINSAliq>
+              </COFINS>
+            </imposto>
+          </det>
+        </infNFe>
+      </NFe>
+    </nfeProc>
+    """
+
+    header, items = parse_nfe(xml)
+
+    # ---------------------------------------------------------
+    # Cabeçalho
+    # ---------------------------------------------------------
+    assert header.numero == "10"
+    assert header.serie == "1"
+    assert header.emit_uf == "SP"
+    assert header.dest_uf == "BA"
+    assert header.natureza_operacao == "VENDA"
+
+    # ---------------------------------------------------------
+    # Quantidade de itens
+    # ---------------------------------------------------------
+    assert len(items) == 1
+
+    item = items[0]
+
+    # ---------------------------------------------------------
+    # Produto
+    # ---------------------------------------------------------
+    assert item.codigo == "001"
+    assert item.descricao == "PEIXE CONGELADO"
+    assert item.ncm == "03038990"
+    assert item.cest == "0300100"
+    assert item.cfop == "6102"
+
+    assert item.quantidade == 10.0
+    assert item.valor_unitario == 20.0
+    assert item.valor_produto == 200.0
+
+    # ---------------------------------------------------------
+    # ICMS
+    # ---------------------------------------------------------
+    assert item.origem == "0"
+    assert item.cst_icms == "00"
+    assert item.bc_icms == 200.0
+    assert item.aliq_icms == 7.0
+    assert item.valor_icms == 14.0
+
+    # ---------------------------------------------------------
+    # PIS
+    # ---------------------------------------------------------
+    assert item.cst_pis == "01"
+    assert item.bc_pis == 200.0
+    assert item.aliq_pis == 1.65
+    assert item.valor_pis == 3.30
+
+    # ---------------------------------------------------------
+    # COFINS
+    # ---------------------------------------------------------
+    assert item.cst_cofins == "01"
+    assert item.bc_cofins == 200.0
+    assert item.aliq_cofins == 7.60
+    assert item.valor_cofins == 15.20
+
+
+if __name__ == "__main__":
+    test_parse_nfe_basico()
+    print("OK - xml_parser.py passou no smoke test.")
