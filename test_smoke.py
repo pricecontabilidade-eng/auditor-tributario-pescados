@@ -28,17 +28,23 @@ def test_parse_nfe_basico():
           </ide>
 
           <emit>
-            <CNPJ>12345678000199</CNPJ>
-            <xNome>EMPRESA EMITENTE</xNome>
-            <UF>SP</UF>
-            <CRT>3</CRT>
-          </emit>
+    <CNPJ>12345678000199</CNPJ>
+    <xNome>EMPRESA EMITENTE</xNome>
+    <enderEmit>
+        <xMun>SAO PAULO</xMun>
+        <UF>SP</UF>
+    </enderEmit>
+    <CRT>3</CRT>
+</emit>
 
-          <dest>
-            <CNPJ>98765432000199</CNPJ>
-            <xNome>EMPRESA DESTINATARIA</xNome>
-            <UF>BA</UF>
-          </dest>
+<dest>
+    <CNPJ>98765432000199</CNPJ>
+    <xNome>EMPRESA DESTINATARIA</xNome>
+    <enderDest>
+        <xMun>SALVADOR</xMun>
+        <UF>BA</UF>
+    </enderDest>
+</dest>
 
           <det nItem="1">
             <prod>
