@@ -277,9 +277,17 @@ def parse_nfe(xml_bytes: bytes):
             "XML não contém grupo infNFe de uma NF-e reconhecível."
         )
 
-    ide = _child_by_local(inf, "ide") or _find_first(inf, "ide")
-    emit = _child_by_local(inf, "emit") or _find_first(inf, "emit")
-    dest = _child_by_local(inf, "dest") or _find_first(inf, "dest")
+   ide = _child_by_local(inf, "ide")
+if ide is None:
+    ide = _find_first(inf, "ide")
+
+emit = _child_by_local(inf, "emit")
+if emit is None:
+    emit = _find_first(inf, "emit")
+
+dest = _child_by_local(inf, "dest")
+if dest is None:
+    dest = _find_first(inf, "dest")
 
     emit_ender = _find_first(emit, "enderEmit")
     dest_ender = _find_first(dest, "enderDest")
@@ -333,8 +341,13 @@ def parse_nfe(xml_bytes: bytes):
 
     for pos, det in enumerate(dets, start=1):
 
-        prod = _child_by_local(det, "prod") or _find_first(det, "prod")
-        imposto = _child_by_local(det, "imposto") or _find_first(det, "imposto")
+       prod = _child_by_local(det, "prod")
+       if prod is None:
+           prod = _find_first(det, "prod")
+
+        imposto = _child_by_local(det, "imposto")
+        if imposto is None:
+            imposto = _find_first(det, "imposto")
 
         item_num = det.get("nItem") or str(pos)
 
