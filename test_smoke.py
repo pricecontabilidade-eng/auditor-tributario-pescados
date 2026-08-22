@@ -80,14 +80,36 @@ def test_parse_nfe_basico():
                 </PISAliq>
               </PIS>
 
-              <COFINS>
-                <COFINSAliq>
-                  <CST>01</CST>
-                  <vBC>200.00</vBC>
-                  <pCOFINS>7.60</pCOFINS>
-                  <vCOFINS>15.20</vCOFINS>
-                </COFINSAliq>
-              </COFINS>
+                             <COFINS>
+                    <COFINSAliq>
+                        <CST>01</CST>
+                        <vBC>200.00</vBC>
+                        <pCOFINS>7.60</pCOFINS>
+                        <vCOFINS>15.20</vCOFINS>
+                    </COFINSAliq>
+                </COFINS>
+
+                <IBSCBS>
+                    <CST>000</CST>
+                    <cClassTrib>000001</cClassTrib>
+                    <vBC>200.00</vBC>
+
+                    <gIBSUF>
+                        <pIBSUF>0.10</pIBSUF>
+                        <vIBSUF>0.20</vIBSUF>
+                    </gIBSUF>
+
+                    <gIBSMun>
+                        <pIBSMun>0.00</pIBSMun>
+                        <vIBSMun>0.00</vIBSMun>
+                    </gIBSMun>
+
+                    <gCBS>
+                        <pCBS>0.90</pCBS>
+                        <vCBS>1.80</vCBS>
+                    </gCBS>
+                </IBSCBS>
+                  
             </imposto>
           </det>
         </infNFe>
@@ -150,7 +172,23 @@ def test_parse_nfe_basico():
     assert item.bc_cofins == 200.0
     assert item.aliq_cofins == 7.60
     assert item.valor_cofins == 15.20
+    # --------------------------------------------------
+    # IBS / CBS
+    # --------------------------------------------------
+    assert item.cst_ibscbs == "000"
+    assert item.cclasstrib == "000001"
+    assert item.bc_ibscbs == 200.0
 
+    assert item.aliq_ibs_uf == 0.10
+    assert item.valor_ibs_uf == 0.20
+
+    assert item.aliq_ibs_mun == 0.00
+    assert item.valor_ibs_mun == 0.00
+
+    assert item.valor_ibs == 0.20
+
+    assert item.aliq_cbs == 0.90
+    assert item.valor_cbs == 1.80
 
 if __name__ == "__main__":
     test_parse_nfe_basico()
