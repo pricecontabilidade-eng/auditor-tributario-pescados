@@ -338,7 +338,7 @@ def parse_nfe(xml_bytes: bytes):
 
     if not dets:
         dets = _find_all(inf, "det")
-        for pos, det in enumerate(dets, start=1):
+    for pos, det in enumerate(dets, start=1):
         prod = _child_by_local(det, "prod")
         if prod is None:
             prod = _find_first(det, "prod")
@@ -348,6 +348,7 @@ def parse_nfe(xml_bytes: bytes):
             imposto = _find_first(det, "imposto")
 
         item_num = det.get("nItem") or str(pos)
+
         codigo = _text(prod, "cProd")
         descricao = _text(prod, "xProd")
         ncm = _text(prod, "NCM")
