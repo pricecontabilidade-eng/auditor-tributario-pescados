@@ -277,16 +277,16 @@ def parse_nfe(xml_bytes: bytes):
             "XML não contém grupo infNFe de uma NF-e reconhecível."
         )
 
-      ide = _child_by_local(inf, "ide")
-      if ide is None:
+        ide = _child_by_local(inf, "ide")
+    if ide is None:
         ide = _find_first(inf, "ide")
 
-      emit = _child_by_local(inf, "emit")
-      if emit is None:
+    emit = _child_by_local(inf, "emit")
+    if emit is None:
         emit = _find_first(inf, "emit")
 
-      dest = _child_by_local(inf, "dest")
-      if dest is None:
+    dest = _child_by_local(inf, "dest")
+    if dest is None:
         dest = _find_first(inf, "dest")
 
     emit_ender = _find_first(emit, "enderEmit")
