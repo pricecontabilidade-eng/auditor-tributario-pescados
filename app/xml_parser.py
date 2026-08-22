@@ -339,11 +339,9 @@ def parse_nfe(xml_bytes: bytes):
     if not dets:
         dets = _find_all(inf, "det")
 
-    for pos, det in enumerate(dets, start=1):
-
-       prod = _child_by_local(det, "prod")
-       if prod is None:
-           prod = _find_first(det, "prod")
+           prod = _child_by_local(det, "prod")
+        if prod is None:
+            prod = _find_first(det, "prod")
 
         imposto = _child_by_local(det, "imposto")
         if imposto is None:
