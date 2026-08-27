@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from app.xml_parser import parse_nfe
-
+from app.rules import interstate_base_rate
 
 def test_parse_nfe_basico():
     """
@@ -189,7 +189,11 @@ def test_parse_nfe_basico():
 
     assert item.aliq_cbs == 0.90
     assert item.valor_cbs == 1.80
-
+def test_interstate_base_rate():
+    assert interstate_base_rate("SP", "BA") == 7.0
+    assert interstate_base_rate("MG", "RJ") == 12.0
+    assert interstate_base_rate("SP", "SP") is None
 if __name__ == "__main__":
     test_parse_nfe_basico()
-    print("OK - xml_parser.py passou no smoke test.")
+    test_interstate_base_rate()
+    print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
