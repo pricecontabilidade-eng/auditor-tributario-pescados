@@ -19,7 +19,27 @@ FISH_HINTS=('PEIX','PESCAD','CAMAR','LAGOST','SIRI','CARANGUE','POLVO','LULA','M
 def interstate_base_rate(orig_uf,dest_uf):
     if not orig_uf or not dest_uf or orig_uf==dest_uf: return None
     return 7.0 if orig_uf in S_SE and dest_uf in DEST_7 else 12.0
+def imported_interstate_rate(
+    origem,
+    industrializado=False,
+    conteudo_importacao=None,
+    sem_similar_nacional=False,
+    ppb=False,
+    gas_natural=False,
+):
+    if origem not in {"1", "2", "3"}:
+        return None
 
+    if sem_similar_nacional or ppb or gas_natural:
+        return None
+
+    if not industrializado:
+        return 4.0
+
+    if conteudo_importacao is not None and conteudo_importacao > 40.0:
+        return 4.0
+
+    return None
 
 def classify_product(item):
     n=(item.ncm or '').replace('.','')
