@@ -33,7 +33,7 @@ def imported_interstate_rate(
     if sem_similar_nacional or ppb or gas_natural:
         return None
     if industrializado is None:
-    return None
+        return None
     if not industrializado:
         return 4.0
 
