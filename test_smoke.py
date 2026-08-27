@@ -223,6 +223,26 @@ def test_imported_interstate_rate():
         sem_similar_nacional=True
     ) is None
 
+    # Origem 2 - estrangeira adquirida no mercado interno
+    assert imported_interstate_rate(
+        "2",
+        industrializado=False
+    ) == 4.0
+
+    # PPB: nao aplicar automaticamente 4%
+    assert imported_interstate_rate(
+        "1",
+        industrializado=False,
+        ppb=True
+    ) is None
+
+    # Gas natural importado: nao aplicar automaticamente 4%
+    assert imported_interstate_rate(
+        "1",
+        industrializado=False,
+        gas_natural=True
+    ) is None
+
 
 if __name__ == "__main__":
     test_parse_nfe_basico()
