@@ -21,7 +21,7 @@ def interstate_base_rate(orig_uf,dest_uf):
     return 7.0 if orig_uf in S_SE and dest_uf in DEST_7 else 12.0
 def imported_interstate_rate(
     origem,
-    industrializado=False,
+    industrializado=None,
     conteudo_importacao=None,
     sem_similar_nacional=False,
     ppb=False,
@@ -32,7 +32,8 @@ def imported_interstate_rate(
 
     if sem_similar_nacional or ppb or gas_natural:
         return None
-
+    if industrializado is None:
+    return None
     if not industrializado:
         return 4.0
 
