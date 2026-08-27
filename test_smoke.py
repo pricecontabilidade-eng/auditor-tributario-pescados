@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from app.xml_parser import parse_nfe
-from app.rules import interstate_base_rate
+from app.rules import interstate_base_rate, imported_interstate_rate
 
 def test_parse_nfe_basico():
     """
@@ -193,7 +193,36 @@ def test_interstate_base_rate():
     assert interstate_base_rate("SP", "BA") == 7.0
     assert interstate_base_rate("MG", "RJ") == 12.0
     assert interstate_base_rate("SP", "SP") is None
+    def test_imported_interstate_rate():
+    # Importado sem industrializacao: 4%
+    assert imported_interstate_rate(
+        "1",
+        industrializado=False
+    ) == 4.0
+
+    # Industrializado com conteudo de importacao superior a 40%: 4%
+    assert imported_interstate_rate(
+        "3",
+        industrializado=True,
+        conteudo_importacao=41.0
+    ) == 4.0
+
+    # Exatamente 40%: nao aplica automaticamente 4%
+    assert imported_interstate_rate(
+        "3",
+        industrializado=True,
+        conteudo_importacao=40.0
+    ) is None
+
+    # Produto enquadrado como sem similar nacional: nao aplica automaticamente
+    assert imported_interstate_rate(
+        "1",
+        industrializado=False,
+        sem_similar_nacional=True
+    ) is None
 if __name__ == "__main__":
+    if __name__ == "__main__":
     test_parse_nfe_basico()
     test_interstate_base_rate()
+    test_imported_interstate_rate()
     print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
