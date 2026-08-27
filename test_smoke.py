@@ -193,7 +193,7 @@ def test_interstate_base_rate():
     assert interstate_base_rate("SP", "BA") == 7.0
     assert interstate_base_rate("MG", "RJ") == 12.0
     assert interstate_base_rate("SP", "SP") is None
-   def test_imported_interstate_rate():
+def test_imported_interstate_rate():
     # Importado sem industrializacao: 4%
     assert imported_interstate_rate(
         "1",
