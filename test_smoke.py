@@ -3,6 +3,9 @@ from pathlib import Path
 from app.xml_parser import parse_nfe
 from app.rules import interstate_base_rate, imported_interstate_rate, audit_item
 from app.knowledge import KnowledgeBase
+from app.report import dataframe_to_xlsx
+from io import BytesIO
+import openpyxl
 def test_parse_nfe_basico():
     """
     Smoke test do parser de NF-e.
@@ -357,10 +360,32 @@ def test_audit_item_pescado():
     assert resultado["Redução CBS %"] == 100
     assert "cClassTrib divergente" in resultado["Alertas"]
     assert "CST IBS/CBS divergente" in resultado["Alertas"]
+    def test_relatorio_excel_status():
+        import pandas as pd
+
+        df = pd.DataFrame([
+            {"NCM": "03038990", "Status": "CORRETO"},
+            {"NCM": "03038990", "Status": "DIVERGENTE"},
+            {"NCM": "03038990", "Status": "PENDENTE DE VALIDAÇÃO"},
+    ])
+
+    arquivo = dataframe_to_xlsx(df)
+
+    wb = openpyxl.load_workbook(BytesIO(arquivo))
+    ws = wb["Auditoria"]
+
+    assert ws["B2"].value == "CORRETO"
+    assert ws["B3"].value == "DIVERGENTE"
+    assert ws["B4"].value == "PENDENTE DE VALIDAÇÃO"
+
+    assert ws["B2"].fill.fgColor.rgb == "00C6EFCE"
+    assert ws["B3"].fill.fgColor.rgb == "00FFC7CE"
+    assert ws["B4"].fill.fgColor.rgb == "00FFEB9C"
 if __name__ == "__main__":
     test_parse_nfe_basico()
     test_interstate_base_rate()
     test_imported_interstate_rate()
     test_knowledge_base_pescado()
     test_audit_item_pescado()
+    test_relatorio_excel_status()
     print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
