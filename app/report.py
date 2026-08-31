@@ -18,4 +18,38 @@ def dataframe_to_xlsx(df: pd.DataFrame) -> bytes:
             ws.column_dimensions[get_column_letter(i)].width=min(max(maxlen+2,12),45)
         for row in ws.iter_rows(min_row=2):
             for c in row: c.alignment=Alignment(vertical='top',wrap_text=True)
+                        # Destaque visual da coluna Status
+        if "Status" in df.columns:
+            status_col = df.columns.get_loc("Status") + 1
+
+            fill_correto = PatternFill(
+                fill_type="solid",
+                fgColor="C6EFCE"
+            )
+
+            fill_divergente = PatternFill(
+                fill_type="solid",
+                fgColor="FFC7CE"
+            )
+
+            fill_pendente = PatternFill(
+                fill_type="solid",
+                fgColor="FFEB9C"
+            )
+
+            for row in range(2, ws.max_row + 1):
+                cell = ws.cell(row=row, column=status_col)
+                status = str(cell.value or "").strip().upper()
+
+                if status == "CORRETO":
+                    cell.fill = fill_correto
+                    cell.font = Font(bold=True)
+
+                elif status == "DIVERGENTE":
+                    cell.fill = fill_divergente
+                    cell.font = Font(bold=True)
+
+                elif status == "PENDENTE DE VALIDAÇÃO":
+                    cell.fill = fill_pendente
+                    cell.font = Font(bold=True)
     return bio.getvalue()
