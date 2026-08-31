@@ -2,7 +2,7 @@ from pathlib import Path
 
 from app.xml_parser import parse_nfe
 from app.rules import interstate_base_rate, imported_interstate_rate
-
+from app.knowledge import KnowledgeBase
 def test_parse_nfe_basico():
     """
     Smoke test do parser de NF-e.
@@ -242,10 +242,27 @@ def test_imported_interstate_rate():
         industrializado=False,
         gas_natural=True
     ) is None
+def test_knowledge_base_pescado():
+    kb = KnowledgeBase(Path(__file__).parent / "base_tributaria")
 
+    regras = kb.find_ncm("03038990")
+    assert regras
+
+    regra = regras[0]
+    assert regra.ncm == "03038990"
+    assert regra.anexo == "I"
+    assert regra.permitido is True
+    assert regra.cclasstrib == "200003"
+
+    info = kb.cclass_info("200003")
+    assert info is not None
+    assert info["cst"] == "200"
+    assert info["pred_ibs"] == 100
+    assert info["pred_cbs"] == 100
 
 if __name__ == "__main__":
     test_parse_nfe_basico()
     test_interstate_base_rate()
     test_imported_interstate_rate()
+    test_knowledge_base_pescado()
     print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
