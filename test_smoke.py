@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from app.xml_parser import parse_nfe
-from app.rules import interstate_base_rate, imported_interstate_rate
+from app.rules import interstate_base_rate, imported_interstate_rate, audit_item
 from app.knowledge import KnowledgeBase
 def test_parse_nfe_basico():
     """
@@ -259,10 +259,108 @@ def test_knowledge_base_pescado():
     assert info["cst"] == "200"
     assert info["pred_ibs"] == 100
     assert info["pred_cbs"] == 100
+def test_audit_item_pescado():
+    xml = b"""<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <NFe>
+    <infNFe Id="NFe123">
+      <ide>
+        <cUF>35</cUF>
+        <natOp>VENDA</natOp>
+        <mod>55</mod>
+        <serie>1</serie>
+        <nNF>10</nNF>
+        <dhEmi>2026-08-20T10:00:00-03:00</dhEmi>
+        <idDest>2</idDest>
+        <indFinal>0</indFinal>
+      </ide>
 
+      <emit>
+        <CNPJ>12345678000199</CNPJ>
+        <xNome>EMPRESA EMITENTE</xNome>
+        <enderEmit>
+          <xMun>SAO PAULO</xMun>
+          <UF>SP</UF>
+        </enderEmit>
+        <CRT>3</CRT>
+      </emit>
+
+      <dest>
+        <CNPJ>98765432000199</CNPJ>
+        <xNome>EMPRESA DESTINATARIA</xNome>
+        <enderDest>
+          <xMun>SALVADOR</xMun>
+          <UF>BA</UF>
+        </enderDest>
+      </dest>
+
+      <det nItem="1">
+        <prod>
+          <cProd>001</cProd>
+          <xProd>PEIXE CONGELADO</xProd>
+          <NCM>03038990</NCM>
+          <CEST>0300100</CEST>
+          <CFOP>6102</CFOP>
+          <uCom>KG</uCom>
+          <qCom>10.0000</qCom>
+          <vUnCom>20.0000</vUnCom>
+          <vProd>200.00</vProd>
+        </prod>
+
+        <imposto>
+          <ICMS>
+            <ICMS00>
+              <orig>0</orig>
+              <CST>00</CST>
+              <vBC>200.00</vBC>
+              <pICMS>7.00</pICMS>
+              <vICMS>14.00</vICMS>
+            </ICMS00>
+          </ICMS>
+
+          <IBSCBS>
+            <CST>000</CST>
+            <cClassTrib>000001</cClassTrib>
+            <vBC>200.00</vBC>
+            <gIBSUF>
+              <pIBSUF>0.10</pIBSUF>
+              <vIBSUF>0.20</vIBSUF>
+            </gIBSUF>
+            <gIBSMun>
+              <pIBSMun>0.00</pIBSMun>
+              <vIBSMun>0.00</vIBSMun>
+            </gIBSMun>
+            <gCBS>
+              <pCBS>0.90</pCBS>
+              <vCBS>1.80</vCBS>
+            </gCBS>
+          </IBSCBS>
+        </imposto>
+      </det>
+    </infNFe>
+  </NFe>
+</nfeProc>
+"""
+
+    header, items = parse_nfe(xml)
+    item = items[0]
+
+    kb = KnowledgeBase(Path(__file__).parent / "base_tributaria")
+
+    resultado = audit_item(header, item, kb)
+
+    assert resultado["NCM"] == "03038990"
+    assert resultado["Pescado?"] == "SIM"
+    assert resultado["CST IBS/CBS esperado"] == "200"
+    assert resultado["cClassTrib esperado"] == "200003"
+    assert resultado["Redução IBS %"] == 100
+    assert resultado["Redução CBS %"] == 100
+    assert "cClassTrib divergente" in resultado["Alertas"]
+    assert "CST IBS/CBS divergente" in resultado["Alertas"]
 if __name__ == "__main__":
     test_parse_nfe_basico()
     test_interstate_base_rate()
     test_imported_interstate_rate()
     test_knowledge_base_pescado()
+    test_audit_item_pescado()
     print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
