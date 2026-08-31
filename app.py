@@ -27,6 +27,41 @@ if files:
         st.error('\n'.join(errors))
     if rows:
         df=pd.DataFrame(rows)
+                ordem_colunas = [
+            "NF-e",
+            "Chave",
+            "Data",
+            "Item",
+            "Produto",
+            "NCM",
+            "Pescado?",
+            "CFOP",
+            "Origem código",
+            "Origem descrição",
+            "UF Origem",
+            "UF Destino",
+            "CST/CSOSN ICMS XML",
+            "Alíquota ICMS XML",
+            "Alíquota ICMS base esperada",
+            "Nota ICMS",
+            "CST PIS XML",
+            "PIS XML",
+            "CST COFINS XML",
+            "COFINS XML",
+            "CST IBS/CBS XML",
+            "CST IBS/CBS esperado",
+            "cClassTrib XML",
+            "cClassTrib esperado",
+            "Redução IBS %",
+            "Redução CBS %",
+            "Enquadramento IBS/CBS",
+            "Status",
+            "Alertas",
+        ]
+
+        colunas_existentes = [c for c in ordem_colunas if c in df.columns]
+        outras_colunas = [c for c in df.columns if c not in colunas_existentes]
+        df = df[colunas_existentes + outras_colunas]
         c1,c2,c3,c4=st.columns(4)
         c1.metric('NF-es',df['Chave'].nunique())
         c2.metric('Itens',len(df))
