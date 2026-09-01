@@ -363,10 +363,10 @@ def test_audit_item_pescado():
 def test_relatorio_excel_status():
     import pandas as pd
 
-     df = pd.DataFrame([
-         {"NCM": "03038990", "Status": "CORRETO"},
-         {"NCM": "03038990", "Status": "DIVERGENTE"},
-         {"NCM": "03038990", "Status": "PENDENTE DE VALIDAÇÃO"},
+    df = pd.DataFrame([
+        {"NCM": "03038990", "Status": "CORRETO"},
+        {"NCM": "03038990", "Status": "DIVERGENTE"},
+        {"NCM": "03038990", "Status": "PENDENTE DE VALIDAÇÃO"},
     ])
 
     arquivo = dataframe_to_xlsx(df)
