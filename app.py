@@ -156,11 +156,11 @@ st.download_button(
         )
 
  st.info(
-            'Importante: benefícios estaduais de ICMS, regra de 4% para '
-            'importados e enquadramento material de PIS/COFINS permanecem '
-            'conservadoramente como pendências quando faltarem dados para '
-            'uma conclusão segura.'
-        )
+     'Importante: benefícios estaduais de ICMS, regra de 4% para '
+     'importados e enquadramento material de PIS/COFINS permanecem '
+     'conservadoramente como pendências quando faltarem dados para '
+     'uma conclusão segura.'
+  )
 
 else:
     st.write('Carregue os XMLs para iniciar a auditoria.')
