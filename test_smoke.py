@@ -360,6 +360,16 @@ def test_audit_item_pescado():
     assert resultado["Redução CBS %"] == 100
     assert "cClassTrib divergente" in resultado["Alertas"]
     assert "CST IBS/CBS divergente" in resultado["Alertas"]
+    assert resultado["CST PIS esperado"] == "06"
+    assert resultado["Aliquota PIS esperada"] == 0.0
+    assert resultado["CST COFINS esperado"] == "06"
+    assert resultado["Aliquota COFINS esperada"] == 0.0
+    assert resultado["Tratamento PIS/COFINS"] == "ALIQUOTA ZERO"
+
+    assert "CST PIS divergente" in resultado["Alertas"]
+    assert "CST COFINS divergente" in resultado["Alertas"]
+    assert "Aliquota PIS divergente" in resultado["Alertas"]
+    assert "Aliquota COFINS divergente" in resultado["Alertas"]
 def test_relatorio_excel_status():
     import pandas as pd
 
