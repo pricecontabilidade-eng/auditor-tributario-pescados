@@ -40,7 +40,7 @@ if files:
     if rows:
         df = pd.DataFrame(rows)
 
-     ordem_colunas = [
+        ordem_colunas = [
     "NF-e",
     "Chave",
     "Data",
