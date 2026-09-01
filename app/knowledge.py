@@ -71,3 +71,99 @@ class KnowledgeBase:
     def cclass_info(self, cc):
         if not cc: return None
         return self.cclass.get(str(cc).strip().zfill(6))
+        def pis_cofins_pescado(self, ncm):
+        """
+        Retorna o tratamento esperado de PIS/COFINS para pescados
+        conforme a regra documentada na Lei 10.925/2004, art. 1, XX,
+        com redacao dada pela Lei 12.839/2013.
+
+        Esta funcao nao presume tributacao normal para produtos
+        que estejam fora do beneficio.
+        """
+        n = (ncm or "").replace(".", "").strip().zfill(8)
+
+        # 03.02 - exceto 03029000
+        if n.startswith("0302") and n != "03029000":
+            return {
+                "tratamento": "ALIQUOTA ZERO",
+                "cst_pis": "06",
+                "cst_cofins": "06",
+                "aliq_pis": 0.0,
+                "aliq_cofins": 0.0,
+                "fundamento": (
+                    "Lei 10.925/2004, art. 1, XX, "
+                    "com redacao dada pela Lei 12.839/2013"
+                ),
+            }
+
+        # 03.03 - peixes congelados
+        if n.startswith("0303"):
+            return {
+                "tratamento": "ALIQUOTA ZERO",
+                "cst_pis": "06",
+                "cst_cofins": "06",
+                "aliq_pis": 0.0,
+                "aliq_cofins": 0.0,
+                "fundamento": (
+                    "Lei 10.925/2004, art. 1, XX, "
+                    "com redacao dada pela Lei 12.839/2013"
+                ),
+            }
+
+        # 03.04 - files e outras carnes de peixes
+        if n.startswith("0304"):
+            return {
+                "tratamento": "ALIQUOTA ZERO",
+                "cst_pis": "06",
+                "cst_cofins": "06",
+                "aliq_pis": 0.0,
+                "aliq_cofins": 0.0,
+                "fundamento": (
+                    "Lei 10.925/2004, art. 1, XX, "
+                    "com redacao dada pela Lei 12.839/2013"
+                ),
+            }
+
+        # Excecao expressa da posicao 03.02
+        if n == "03029000":
+            return {
+                "tratamento": "VALIDAR OUTRA BASE LEGAL",
+                "cst_pis": None,
+                "cst_cofins": None,
+                "aliq_pis": None,
+                "aliq_cofins": None,
+                "fundamento": (
+                    "NCM 03029000 excluido da regra especifica "
+                    "da Lei 12.839/2013"
+                ),
+            }
+
+        # 03.06 - crustaceos
+        if n.startswith("0306"):
+            return {
+                "tratamento": "VALIDAR OUTRA BASE LEGAL",
+                "cst_pis": None,
+                "cst_cofins": None,
+                "aliq_pis": None,
+                "aliq_cofins": None,
+                "fundamento": (
+                    "Crustaceo nao abrangido automaticamente pela "
+                    "regra especifica da Lei 12.839/2013"
+                ),
+            }
+
+        # 03.07 - moluscos
+        if n.startswith("0307"):
+            return {
+                "tratamento": "VALIDAR OUTRA BASE LEGAL",
+                "cst_pis": None,
+                "cst_cofins": None,
+                "aliq_pis": None,
+                "aliq_cofins": None,
+                "fundamento": (
+                    "Molusco nao abrangido automaticamente pela "
+                    "regra especifica da Lei 12.839/2013"
+                ),
+            }
+
+        return None
