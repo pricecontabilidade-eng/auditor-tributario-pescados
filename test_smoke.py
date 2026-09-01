@@ -381,6 +381,43 @@ def test_relatorio_excel_status():
     assert ws["B2"].fill.fgColor.rgb == "00C6EFCE"
     assert ws["B3"].fill.fgColor.rgb == "00FFC7CE"
     assert ws["B4"].fill.fgColor.rgb == "00FFEB9C"
+
+def test_pis_cofins_pescado():
+    kb = KnowledgeBase(Path(__file__).parent / "base_tributaria")
+
+    # PANGA - NCM 0304: beneficio de aliquota zero
+    regra = kb.pis_cofins_pescado("03046290")
+    assert regra is not None
+    assert regra["tratamento"] == "ALIQUOTA ZERO"
+    assert regra["cst_pis"] == "06"
+    assert regra["cst_cofins"] == "06"
+    assert regra["aliq_pis"] == 0.0
+    assert regra["aliq_cofins"] == 0.0
+
+    # CAMARAO - NCM 0306: fora da regra especifica
+    regra = kb.pis_cofins_pescado("03063600")
+    assert regra is not None
+    assert regra["tratamento"] == "VALIDAR OUTRA BASE LEGAL"
+    assert regra["cst_pis"] is None
+    assert regra["cst_cofins"] is None
+
+    # LULA/POLVO - NCM 0307: fora da regra especifica
+    regra = kb.pis_cofins_pescado("03074900")
+    assert regra is not None
+    assert regra["tratamento"] == "VALIDAR OUTRA BASE LEGAL"
+    assert regra["cst_pis"] is None
+    assert regra["cst_cofins"] is None
+
+    # Excecao expressa da posicao 03.02
+    regra = kb.pis_cofins_pescado("03029000")
+    assert regra is not None
+    assert regra["tratamento"] == "VALIDAR OUTRA BASE LEGAL"
+    assert regra["cst_pis"] is None
+    assert regra["cst_cofins"] is None
+
+    # NCM sem regra automatica conhecida
+    regra = kb.pis_cofins_pescado("99999999")
+    assert regra is None
 if __name__ == "__main__":
     test_parse_nfe_basico()
     test_interstate_base_rate()
@@ -388,4 +425,5 @@ if __name__ == "__main__":
     test_knowledge_base_pescado()
     test_audit_item_pescado()
     test_relatorio_excel_status()
+    test_pis_cofins_pescado()
     print("OK - xml_parser.py e regras interestaduais passaram no smoke test.")
