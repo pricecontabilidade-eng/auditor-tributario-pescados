@@ -118,49 +118,48 @@ if files:
             (df['Status'] == 'DIVERGENTE').sum()
         )
 
-        st.subheader('Resultado consolidado')
+    st.subheader('Resultado consolidado')
 
-def destacar_status(row):
-    status = str(row.get("Status", "")).upper()
+    def destacar_status(row):
+        status = str(row.get("Status", "")).upper()
 
-    if status == "CORRETO":
-        cor = "background-color: #C6EFCE; color: #006100;"
-    elif status == "DIVERGENTE":
-        cor = "background-color: #FFC7CE; color: #9C0006;"
-    else:
-        cor = "background-color: #FFEB9C; color: #9C6500;"
+        if status == "CORRETO":
+            cor = "background-color: #C6EFCE; color: #006100;"
+        elif status == "DIVERGENTE":
+            cor = "background-color: #FFC7CE; color: #9C0006;"
+        else:
+            cor = "background-color: #FFEB9C; color: #9C6500;"
 
-    return [cor] * len(row)
+        return [cor] * len(row)
 
+    df_visual = df.style.apply(destacar_status, axis=1)
 
-df_visual = df.style.apply(destacar_status, axis=1)
+    st.dataframe(
+        df_visual,
+        use_container_width=True,
+        height=520
+    )
 
-st.dataframe(
-    df_visual,
-    use_container_width=True,
-    height=520
-)
+    st.download_button(
+        'Baixar relatório Excel',
+        data=dataframe_to_xlsx(df),
+        file_name='auditoria_pescados.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
-st.download_button(
-            'Baixar relatório Excel',
-            data=dataframe_to_xlsx(df),
-            file_name='auditoria_pescados.xlsx',
-            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+    st.download_button(
+        'Baixar CSV',
+        data=df.to_csv(index=False).encode('utf-8-sig'),
+        file_name='auditoria_pescados.csv',
+        mime='text/csv'
+    )
 
-st.download_button(
-            'Baixar CSV',
-            data=df.to_csv(index=False).encode('utf-8-sig'),
-            file_name='auditoria_pescados.csv',
-            mime='text/csv'
-        )
-
- st.info(
-     'Importante: benefícios estaduais de ICMS, regra de 4% para '
-     'importados e enquadramento material de PIS/COFINS permanecem '
-     'conservadoramente como pendências quando faltarem dados para '
-     'uma conclusão segura.'
-  )
+    st.info(
+        'Importante: benefícios estaduais de ICMS, regra de 4% para '
+        'importados e enquadramento material de PIS/COFINS permanecem '
+        'conservadoramente como pendências quando faltarem dados para '
+        'uma conclusão segura.'
+    )
 
 else:
     st.write('Carregue os XMLs para iniciar a auditoria.')
