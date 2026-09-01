@@ -40,37 +40,49 @@ if files:
     if rows:
         df = pd.DataFrame(rows)
 
-        ordem_colunas = [
-            "NF-e",
-            "Chave",
-            "Data",
-            "Item",
-            "Produto",
-            "NCM",
-            "Pescado?",
-            "CFOP",
-            "Origem código",
-            "Origem descrição",
-            "UF Origem",
-            "UF Destino",
-            "CST/CSOSN ICMS XML",
-            "Alíquota ICMS XML",
-            "Alíquota ICMS base esperada",
-            "Nota ICMS",
-            "CST PIS XML",
-            "PIS XML",
-            "CST COFINS XML",
-            "COFINS XML",
-            "CST IBS/CBS XML",
-            "CST IBS/CBS esperado",
-            "cClassTrib XML",
-            "cClassTrib esperado",
-            "Redução IBS %",
-            "Redução CBS %",
-            "Enquadramento IBS/CBS",
-            "Status",
-            "Alertas",
-        ]
+     ordem_colunas = [
+    "NF-e",
+    "Chave",
+    "Data",
+    "Item",
+    "Produto",
+    "NCM",
+    "Pescado?",
+    "CFOP",
+    "Origem código",
+    "Origem descrição",
+    "UF Origem",
+    "UF Destino",
+
+    "CST/CSOSN ICMS XML",
+    "Alíquota ICMS XML",
+    "Alíquota ICMS base esperada",
+    "Nota ICMS",
+
+    "CST PIS XML",
+    "CST PIS esperado",
+    "Aliquota PIS esperada",
+    "PIS XML",
+
+    "CST COFINS XML",
+    "CST COFINS esperado",
+    "Aliquota COFINS esperada",
+    "COFINS XML",
+
+    "Tratamento PIS/COFINS",
+    "Fundamento PIS/COFINS",
+
+    "CST IBS/CBS XML",
+    "CST IBS/CBS esperado",
+    "cClassTrib XML",
+    "cClassTrib esperado",
+    "Redução IBS %",
+    "Redução CBS %",
+    "Enquadramento IBS/CBS",
+
+    "Status",
+    "Alertas",
+] 
 
         colunas_existentes = [
             c for c in ordem_colunas
@@ -108,11 +120,26 @@ if files:
 
         st.subheader('Resultado consolidado')
 
-        st.dataframe(
-            df,
-            use_container_width=True,
-            height=520
-        )
+        def destacar_status(row):
+    status = str(row.get("Status", "")).upper()
+
+    if status == "CORRETO":
+        cor = "background-color: #C6EFCE; color: #006100;"
+    elif status == "DIVERGENTE":
+        cor = "background-color: #FFC7CE; color: #9C0006;"
+    else:
+        cor = "background-color: #FFEB9C; color: #9C6500;"
+
+    return [cor] * len(row)
+
+
+df_visual = df.style.apply(destacar_status, axis=1)
+
+st.dataframe(
+    df_visual,
+    use_container_width=True,
+    height=520
+)
 
         st.download_button(
             'Baixar relatório Excel',
