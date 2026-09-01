@@ -360,13 +360,13 @@ def test_audit_item_pescado():
     assert resultado["Redução CBS %"] == 100
     assert "cClassTrib divergente" in resultado["Alertas"]
     assert "CST IBS/CBS divergente" in resultado["Alertas"]
-    def test_relatorio_excel_status():
-        import pandas as pd
+def test_relatorio_excel_status():
+    import pandas as pd
 
-        df = pd.DataFrame([
-            {"NCM": "03038990", "Status": "CORRETO"},
-            {"NCM": "03038990", "Status": "DIVERGENTE"},
-            {"NCM": "03038990", "Status": "PENDENTE DE VALIDAÇÃO"},
+     df = pd.DataFrame([
+         {"NCM": "03038990", "Status": "CORRETO"},
+         {"NCM": "03038990", "Status": "DIVERGENTE"},
+         {"NCM": "03038990", "Status": "PENDENTE DE VALIDAÇÃO"},
     ])
 
     arquivo = dataframe_to_xlsx(df)
