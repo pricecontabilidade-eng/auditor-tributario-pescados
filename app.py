@@ -26,7 +26,7 @@ if files:
     if errors:
         st.error('\n'.join(errors))
     if rows:
-        df=pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
                 ordem_colunas = [
             "NF-e",
             "Chave",
