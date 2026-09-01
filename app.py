@@ -120,7 +120,7 @@ if files:
 
         st.subheader('Resultado consolidado')
 
-        def destacar_status(row):
+def destacar_status(row):
     status = str(row.get("Status", "")).upper()
 
     if status == "CORRETO":
