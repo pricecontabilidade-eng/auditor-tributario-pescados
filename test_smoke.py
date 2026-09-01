@@ -320,7 +320,23 @@ def test_audit_item_pescado():
               <vICMS>14.00</vICMS>
             </ICMS00>
           </ICMS>
+            <PIS>
+                <PISAliq>
+                    <CST>01</CST>
+                    <vBC>200.00</vBC>
+                    <pPIS>1.65</pPIS>
+                    <vPIS>3.30</vPIS>
+                </PISAliq>
+            </PIS>
 
+            <COFINS>
+                <COFINSAliq>
+                    <CST>01</CST>
+                    <vBC>200.00</vBC>
+                    <pCOFINS>7.60</pCOFINS>
+                    <vCOFINS>15.20</vCOFINS>
+                </COFINSAliq>
+            </COFINS>
           <IBSCBS>
             <CST>000</CST>
             <cClassTrib>000001</cClassTrib>
