@@ -141,21 +141,21 @@ st.dataframe(
     height=520
 )
 
-        st.download_button(
+st.download_button(
             'Baixar relatório Excel',
             data=dataframe_to_xlsx(df),
             file_name='auditoria_pescados.xlsx',
             mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
 
-        st.download_button(
+st.download_button(
             'Baixar CSV',
             data=df.to_csv(index=False).encode('utf-8-sig'),
             file_name='auditoria_pescados.csv',
             mime='text/csv'
         )
 
-        st.info(
+ st.info(
             'Importante: benefícios estaduais de ICMS, regra de 4% para '
             'importados e enquadramento material de PIS/COFINS permanecem '
             'conservadoramente como pendências quando faltarem dados para '
