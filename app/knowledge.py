@@ -71,7 +71,7 @@ class KnowledgeBase:
     def cclass_info(self, cc):
         if not cc: return None
         return self.cclass.get(str(cc).strip().zfill(6))
-        def pis_cofins_pescado(self, ncm):
+    def pis_cofins_pescado(self, ncm):
         """
         Retorna o tratamento esperado de PIS/COFINS para pescados
         conforme a regra documentada na Lei 10.925/2004, art. 1, XX,
