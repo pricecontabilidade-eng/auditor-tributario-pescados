@@ -92,7 +92,37 @@ def audit_item(header,item,kb):
     cc_expected=chosen.cclasstrib if chosen else None
     red_ibs=ci.get('pred_ibs') if ci else None
     red_cbs=ci.get('pred_cbs') if ci else None
+    pis_cofins_rule = kb.pis_cofins_pescado(ncm)
 
+    cst_pis_expected = (
+        pis_cofins_rule.get("cst_pis")
+        if pis_cofins_rule else None
+    )
+
+    cst_cofins_expected = (
+        pis_cofins_rule.get("cst_cofins")
+        if pis_cofins_rule else None
+    )
+
+    aliq_pis_expected = (
+        pis_cofins_rule.get("aliq_pis")
+        if pis_cofins_rule else None
+    )
+
+    aliq_cofins_expected = (
+        pis_cofins_rule.get("aliq_cofins")
+        if pis_cofins_rule else None
+    )
+
+    pis_cofins_tratamento = (
+        pis_cofins_rule.get("tratamento")
+        if pis_cofins_rule else None
+    )
+
+    pis_cofins_fundamento = (
+        pis_cofins_rule.get("fundamento")
+        if pis_cofins_rule else None
+    )
     flags=[]
     if not pescado: flags.append('Item não identificado como pescado com segurança')
         # Regra ICMS/RJ - classificacao dos pescados fora da cesta basica estadual
@@ -132,7 +162,56 @@ def audit_item(header,item,kb):
     if item.aliq_icms is not None and icms_expected is not None and abs(item.aliq_icms-icms_expected)>0.01: flags.append('Alíquota ICMS difere da matriz-base (pode haver regra/benefício específico)')
     if item.origem in {'1','2','3'}: flags.append('Validar regra de 4% para importados antes de concluir ICMS')
     flags.append('Benefícios estaduais de ICMS não automatizados sem base normativa por UF')
-    flags.append('PIS/COFINS: CST lido, mas enquadramento material exige base legal específica por produto/operação')
+    if pis_cofins_rule:
+        if pis_cofins_tratamento == "ALIQUOTA ZERO":
+            if (
+                item.cst_pis
+                and cst_pis_expected
+                and str(item.cst_pis).zfill(2) != str(cst_pis_expected).zfill(2)
+            ):
+                flags.append(
+                    f"CST PIS divergente: XML {item.cst_pis}; "
+                    f"esperado {cst_pis_expected}"
+                )
+
+            if (
+                item.cst_cofins
+                and cst_cofins_expected
+                and str(item.cst_cofins).zfill(2) != str(cst_cofins_expected).zfill(2)
+            ):
+                flags.append(
+                    f"CST COFINS divergente: XML {item.cst_cofins}; "
+                    f"esperado {cst_cofins_expected}"
+                )
+
+            if (
+                item.aliq_pis is not None
+                and aliq_pis_expected is not None
+                and abs(item.aliq_pis - aliq_pis_expected) > 0.01
+            ):
+                flags.append(
+                    f"Aliquota PIS divergente: XML {item.aliq_pis:.2f}%; "
+                    f"esperado {aliq_pis_expected:.2f}%"
+                )
+
+            if (
+                item.aliq_cofins is not None
+                and aliq_cofins_expected is not None
+                and abs(item.aliq_cofins - aliq_cofins_expected) > 0.01
+            ):
+                flags.append(
+                    f"Aliquota COFINS divergente: XML {item.aliq_cofins:.2f}%; "
+                    f"esperado {aliq_cofins_expected:.2f}%"
+                )
+
+        elif pis_cofins_tratamento == "VALIDAR OUTRA BASE LEGAL":
+            flags.append(
+                "PIS/COFINS: validar outra base legal aplicavel ao produto/operacao"
+            )
+    else:
+        flags.append(
+            "PIS/COFINS: tratamento nao automatizado para este NCM"
+        )
 
     status='CORRETO' if not [f for f in flags if 'divergente' in f.lower()] else 'DIVERGENTE'
     if any('Validar' in f or 'não automatizados' in f or 'exige base' in f for f in flags):
@@ -142,7 +221,16 @@ def audit_item(header,item,kb):
       'NF-e':header.numero,'Chave':header.chave,'Data':header.data_emissao,'Item':item.item,'Produto':item.descricao,'NCM':ncm,'Pescado?':'SIM' if pescado else 'NÃO/INCERTO',
       'CFOP':item.cfop,'Origem código':item.origem,'Origem descrição':origem_desc,'UF Origem':header.emit_uf,'UF Destino':header.dest_uf,
       'CST/CSOSN ICMS XML':item.cst_icms or item.csosn,'Alíquota ICMS XML':item.aliq_icms,'Alíquota ICMS base esperada':icms_expected,'Nota ICMS':icms_note,
-      'CST PIS XML':item.cst_pis,'PIS XML':item.valor_pis,'CST COFINS XML':item.cst_cofins,'COFINS XML':item.valor_cofins,
+      'CST PIS XML':item.cst_pis,'PIS XML':item.valor_pis,
+      'CST COFINS XML':item.cst_cofins,'COFINS XML':item.valor_cofins,
+        
+      'CST PIS esperado': cst_pis_expected,
+      'Aliquota PIS esperada': aliq_pis_expected,
+      'CST COFINS esperado': cst_cofins_expected,
+      'Aliquota COFINS esperada': aliq_cofins_expected,
+      'Tratamento PIS/COFINS': pis_cofins_tratamento,
+      'Fundamento PIS/COFINS': pis_cofins_fundamento, 
+        
       'CST IBS/CBS XML':item.cst_ibscbs,'CST IBS/CBS esperado':cst_expected,'cClassTrib XML':item.cclasstrib,'cClassTrib esperado':cc_expected,
       'Redução IBS %':red_ibs,'Redução CBS %':red_cbs,'Enquadramento IBS/CBS':legal_note,'Status':status,'Alertas':' | '.join(flags)
     }
