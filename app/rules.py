@@ -95,11 +95,20 @@ def audit_item(header,item,kb):
 
     flags=[]
     if not pescado: flags.append('Item não identificado como pescado com segurança')
-        # Regra ICMS/RJ - crustaceos fora da regra geral de 7% da cesta basica
+        # Regra ICMS/RJ - classificacao dos pescados fora da cesta basica estadual
+    # 0306 = crustaceos (camarao, lagosta, caranguejo etc.)
+    # 0307 = moluscos (lula, polvo, mexilhao, ostra etc.)
     crustaceo = bool(
         ncm
         and ncm.startswith("0306")
     )
+
+    molusco = bool(
+        ncm
+        and ncm.startswith("0307")
+    )
+
+    fora_cesta_basica_rj = crustaceo or molusco
 
     operacao_interna_rj = (
         header.emit_uf == "RJ"
@@ -108,14 +117,16 @@ def audit_item(header,item,kb):
 
     if (
         operacao_interna_rj
-        and crustaceo
+        and fora_cesta_basica_rj
         and item.aliq_icms is not None
         and abs(item.aliq_icms - 7.0) < 0.01
     ):
+        tipo_pescado = "crustaceo" if crustaceo else "molusco"
+
         flags.append(
-            "ICMS RJ: crustaceo excluido da regra geral de 7% da cesta basica; "
+            f"ICMS RJ: {tipo_pescado} fora da regra geral de 7% da cesta basica; "
             "validar beneficio ou enquadramento estadual especifico"
-        )    
+        )  
     if item.cclasstrib and cc_expected and item.cclasstrib.zfill(6)!=str(cc_expected).zfill(6): flags.append('cClassTrib divergente')
     if item.cst_ibscbs and cst_expected and item.cst_ibscbs.zfill(3)!=str(cst_expected).zfill(3): flags.append('CST IBS/CBS divergente')
     if item.aliq_icms is not None and icms_expected is not None and abs(item.aliq_icms-icms_expected)>0.01: flags.append('Alíquota ICMS difere da matriz-base (pode haver regra/benefício específico)')
